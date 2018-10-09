@@ -25,7 +25,9 @@ func NewGooglePrices(client *http.Client) *googlePricesClient {
 }
 
 func (gp *googlePricesClient) FetchPrices(ticker domain.Ticker, period Period) (*domain.PriceHistory, error) {
-	symbolEncoded, eiCode, err := gp.searchSymbolAndEi(fmt.Sprintf("%s:%s", ticker.Market, ticker.Symbol))
+	symbol := fmt.Sprintf("%s:%s", ticker.Market, ticker.Symbol)
+	defer timeTrack(time.Now(), symbol)
+	symbolEncoded, eiCode, err := gp.searchSymbolAndEi(symbol)
 	if err != nil {
 		log.Printf("Unable to get symbol for ticker: %s. Error: %s", ticker, err)
 		return nil, err
@@ -187,7 +189,7 @@ func readGoogleResponse(str string) (*domain.PriceHistory, error) {
 	if err != nil {
 		return nil, err
 	}
-	println()
+
 	return &domain.PriceHistory{
 		Currency:      data6[7].(string),
 		Name:          data617[1].(string),
@@ -219,4 +221,9 @@ func i2s(slice interface{}) ([]interface{}, error) {
 	}
 
 	return ret, nil
+}
+
+func timeTrack(start time.Time, name string) {
+	elapsed := time.Since(start)
+	log.Printf("%s took %s", name, elapsed)
 }

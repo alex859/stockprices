@@ -10,12 +10,13 @@ import (
 
 type getPricesUseCase struct {
 	priceProvider PriceProvider
+	numWorkers int
 }
-func NewGetPricesUseCase(dataProvider PriceProvider) price.GetPricesUseCase {
-	return &getPricesUseCase{priceProvider: dataProvider}
+func NewGetPricesUseCase(dataProvider PriceProvider, numWorkers int) price.GetPricesUseCase {
+	return &getPricesUseCase{priceProvider: dataProvider, numWorkers:numWorkers}
 }
 
-type resultError struct {
+type resultErrorChannel struct {
 	result *domain.PriceHistory
 	err error
 }
@@ -26,17 +27,17 @@ func (useCase *getPricesUseCase) GetMultiplePrices(tickers []domain.Ticker, from
 		return map[domain.Ticker]*domain.PriceHistory{}, nil
 	}
 
-	resultsChannel := make(chan resultError, n)
+	resultsChannel := make(chan resultErrorChannel, n)
+	tickersChannel := make(chan domain.Ticker, n)
+
+	for w := 1; w <= useCase.numWorkers; w++ {
+		go priceProviderWorker(useCase.priceProvider, tickersChannel, resultsChannel, from, to)
+	}
 
 	for _, ticker := range tickers {
-		go func(ticker domain.Ticker, from time.Time, to time.Time, ch chan<- resultError) {
-			history, err := useCase.priceProvider.FetchPrices(ticker, from, to)
-			if err != nil {
-				log.Printf("An error occured while fetching prices for ticker: %s, from: %s, to: %s. Error: %s", ticker.String(), from, to, err)
-			}
-			ch <- resultError{result:history, err:err}
-		}(ticker, from, to, resultsChannel)
+		tickersChannel <- ticker
 	}
+	close(tickersChannel)
 
 	result := map[domain.Ticker]*domain.PriceHistory{}
 	for i := 0; i < n; i++ {
@@ -51,4 +52,14 @@ func (useCase *getPricesUseCase) GetMultiplePrices(tickers []domain.Ticker, from
 	}
 
 	return result, nil
+}
+
+func priceProviderWorker(priceProvider PriceProvider, tickersChannel <-chan domain.Ticker, ch chan<- resultErrorChannel, from time.Time, to time.Time, ) {
+	for ticker := range tickersChannel {
+		history, err := priceProvider.FetchPrices(ticker, from, to)
+		if err != nil {
+			log.Printf("An error occured while fetching prices for ticker: %s, from: %s, to: %s. Error: %s", ticker.String(), from, to, err)
+		}
+		ch <- resultErrorChannel{result:history, err:err}
+	}
 }
