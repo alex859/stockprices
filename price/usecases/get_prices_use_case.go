@@ -9,10 +9,10 @@ import (
 )
 
 type getPricesUseCase struct {
-	priceProvider PriceProvider
-	numWorkers int
+	priceProvider PricesProvider
+	numWorkers    int
 }
-func NewGetPricesUseCase(dataProvider PriceProvider, numWorkers int) price.GetPricesUseCase {
+func NewGetPricesUseCase(dataProvider PricesProvider, numWorkers int) price.GetPricesUseCase {
 	return &getPricesUseCase{priceProvider: dataProvider, numWorkers:numWorkers}
 }
 
@@ -54,7 +54,7 @@ func (useCase *getPricesUseCase) GetMultiplePrices(tickers []domain.Ticker, from
 	return result, nil
 }
 
-func priceProviderWorker(priceProvider PriceProvider, tickersChannel <-chan domain.Ticker, ch chan<- resultErrorChannel, from time.Time, to time.Time, ) {
+func priceProviderWorker(priceProvider PricesProvider, tickersChannel <-chan domain.Ticker, ch chan<- resultErrorChannel, from time.Time, to time.Time, ) {
 	for ticker := range tickersChannel {
 		history, err := priceProvider.FetchPrices(ticker, from, to)
 		if err != nil {

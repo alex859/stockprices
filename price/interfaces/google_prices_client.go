@@ -194,7 +194,7 @@ func readGoogleResponse(str string) (*domain.PriceHistory, error) {
 		Currency:      data6[7].(string),
 		Name:          data617[1].(string),
 		Ticker:        domain.Ticker{Symbol:data617[2].(string), Market:data6[3].(string)},
-		CurrentPrice:  data617[4].(float64),
+		LastPrice:     data617[4].(float64),
 		LastPriceTime: data617[8].(string),
 		Prices:        prices,
 	}, nil

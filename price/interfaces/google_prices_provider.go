@@ -12,7 +12,7 @@ type googlePricesProvider struct {
 	googlePricesClient *googlePricesClient
 }
 
-func NewGooglePricesProvider(client *googlePricesClient) usecases.PriceProvider {
+func NewGooglePricesProvider(client *googlePricesClient) usecases.PricesProvider {
 	return &googlePricesProvider{client}
 }
 

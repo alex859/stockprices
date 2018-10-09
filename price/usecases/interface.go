@@ -5,10 +5,10 @@ import (
 	"time"
 )
 
-type PriceProvider interface {
+type PricesProvider interface {
 	FetchPrices(ticker domain.Ticker, from time.Time, to time.Time) (*domain.PriceHistory, error)
 }
 
-type PriceSaver interface {
+type PricesSaver interface {
 	SavePrices(ticker domain.Ticker, prices *domain.PriceHistory) error
 }

@@ -11,7 +11,7 @@ type PriceHistory struct {
 	Name          string    `json:"name"`
 	Ticker        Ticker    `json:"ticker"`
 	Currency      string    `json:"currency"`
-	CurrentPrice  float64   `json:"current_price"`
+	LastPrice     float64   `json:"current_price"`
 	LastPriceTime string    `json:"last_price_time"`
 	Prices        PriceList `json:"prices"`
 }
