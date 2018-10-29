@@ -17,10 +17,10 @@ import (
 )
 
 func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	configuration := ReadConfig()
+	//configuration := ReadConfig()
 	googleFinancePriceFetcher := googlefinance.NewDefaultGooglePricesFetcher(http.DefaultClient)
 	pricesProvider := pricesprovider.NewGoogleFinancePricesProvider(googleFinancePriceFetcher, googlefinance.NewGoogleFinanceResponseConverter())
-	useCase := usecases.NewGetHistoricalPricesUseCase(pricesProvider, configuration.NumPriceProviderWorkers)
+	useCase := usecases.NewGetHistoricalPricesUseCase(pricesProvider, 5)
 	symbols := strings.Split(request.QueryStringParameters["symbols"], ",")
 	fromStr := request.QueryStringParameters["from"]
 	toStr := request.QueryStringParameters["to"]
