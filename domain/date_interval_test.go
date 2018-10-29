@@ -1,56 +1,24 @@
-package interfaces
+package domain
 
 import (
-	"reflect"
-	"testing"
 	"time"
-
-	"org.alex859/stockprices/domain"
+	"testing"
+	"github.com/stretchr/testify/assert"
 )
 
+func Test_NewInterval(t *testing.T) {
+	var firstOctober2018, _ = time.Parse("02-01-2006", "01-10-2018")
+	var firstDecember2018, _ = time.Parse("02-01-2006", "01-11-2018")
+	_, err := NewDateInterval(firstDecember2018, firstOctober2018)
+	assert.Error(t, err)
 
-func Test_filterPriceList(t *testing.T) {
-	var may5, _ = time.Parse("02-01-2006", "05-05-2018")
-	var may6, _ = time.Parse("02-01-2006", "06-05-2018")
-	var june6, _ = time.Parse("02-01-2006", "06-06-2018")
-	var july6, _ = time.Parse("02-01-2006", "06-07-2018")
-	var july16, _ = time.Parse("02-01-2006", "16-07-2018")
-	var august6, _ = time.Parse("02-01-2006", "06-08-2018")
-	var august16, _ = time.Parse("02-01-2006", "16-08-2018")
-	var may6pp = domain.PricePoint{Time:may6, Price:200}
-	var june6pp = domain.PricePoint{Time:june6, Price:201}
-	var july6pp = domain.PricePoint{Time:july6, Price:2001}
-	var august6pp = domain.PricePoint{Time:august6, Price:2301}
-	var priceList = domain.PriceList{may6pp, june6pp, july6pp, august6pp}
-	type args struct {
-		list domain.PriceList
-		from time.Time
-		to   time.Time
-	}
-	tests := []struct {
-		name string
-		args args
-		want domain.PriceList
-	}{
-		{"When empty list should return empty list", args{from:may5, to:june6, list:domain.PriceList{}}, domain.PriceList{}},
-		{"When to before from return empty list", args{from:august6, to:may6, list:priceList}, domain.PriceList{}},
-		{"When all in interval return full", args{from:may5, to:august16, list:priceList}, priceList},
-		{"When all in interval left extreme included return full", args{from:may6, to:august16, list:priceList}, priceList},
-		{"When all in interval right extreme included return full", args{from:may6, to:july16, list:priceList}, domain.PriceList{may6pp, june6pp, july6pp}},
-		{"When some in interval return only in interval", args{from:may6, to:august6, list:priceList}, priceList},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := filterPriceList(tt.args.list, tt.args.from, tt.args.to); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("filterPriceList() = %v, want %v", got, tt.want)
-			}
-		})
+	interval, err := NewDateInterval(firstOctober2018, firstDecember2018)
+	if assert.NoError(t, err) {
+		assert.Equal(t, DateInterval{from: firstOctober2018, to: firstDecember2018}, interval)
 	}
 }
 
-func Test_timeToPeriod(t *testing.T) {
-	var firstOctober2018, _ = time.Parse("02-01-2006", "01-10-2018")
-	var firstDecember2018, _ = time.Parse("02-01-2006", "01-11-2018")
+func Test_ToPeriod(t *testing.T) {
 	var today = time.Now()
 	var today10AM = time.Date(today.Year(), today.Month(), today.Day(), 10, 0, 0, 0, time.UTC)
 	var today12PM = time.Date(today.Year(), today.Month(), today.Day(), 12, 0, 0, 0, time.UTC)
@@ -75,7 +43,6 @@ func Test_timeToPeriod(t *testing.T) {
 		want    Period
 		wantErr bool
 	}{
-		{"When to before from should return error", args{from:firstDecember2018, to:firstOctober2018}, Unknown, true},
 		{"When from and to in today should return OneDay", args{from: today10AM, to: today12PM}, OneDay, false},
 		{"When from between one and five days ago should return FiveDay", args{from: threeDaysAgo, to: today}, FiveDays, false},
 		// to be able to test this we should mock time.Now()
@@ -92,12 +59,9 @@ func Test_timeToPeriod(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := timeToPeriod(tt.args.from, tt.args.to)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("timeToPeriod() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if err == nil {
+			interval, err := NewDateInterval(tt.args.from, tt.args.to)
+			if assert.NoError(t, err) {
+				got := interval.ToPeriod()
 				if got != tt.want {
 					t.Errorf("timeToPeriod() = %v, want %v", got, tt.want)
 				}

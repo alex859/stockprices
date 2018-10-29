@@ -1,10 +1,9 @@
-package interfaces
+package googlefinance
 
 import (
-	"testing"
 	"io/ioutil"
+	"testing"
 	"github.com/stretchr/testify/assert"
-	"org.alex859/stockprices/domain"
 )
 
 func Test_readGoogleResponse_Year_AllGood(t *testing.T) {
@@ -14,9 +13,10 @@ func Test_readGoogleResponse_Year_AllGood(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, result)
 
-	assert.Equal(t, domain.Ticker{Market:"LON", Symbol:"ANP"}, result.Ticker)
+	assert.Equal(t, "LON", result.Market)
+	assert.Equal(t, "ANP", result.Symbol)
 	assert.Equal(t, "GBX", result.Currency)
-	assert.Equal(t, 172, len(result.Prices))
+	assert.Equal(t, 172, len(result.PricesRows))
 }
 
 func Test_readGoogleResponse_Day_AllGood(t *testing.T) {
@@ -26,31 +26,23 @@ func Test_readGoogleResponse_Day_AllGood(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, result)
 
-	assert.Equal(t, domain.Ticker{Market:"LON", Symbol:"ANP"}, result.Ticker)
+	assert.Equal(t, "LON", result.Market)
+	assert.Equal(t, "ANP", result.Symbol)
 	assert.Equal(t, "GBX", result.Currency)
-	assert.Equal(t, 6, len(result.Prices))
-}
-
-func Test_readGoogleResponse_WrongPriceFormat(t *testing.T) {
-	str, _ := ioutil.ReadFile("testdata/google_finance_day_wrong_price_format")
-	result, err := readGoogleResponse(string(str))
-
-	assert.NotNil(t, err)
-	assert.Nil(t, result)
+	assert.Equal(t, 6, len(result.PricesRows))
 }
 
 func Test_readGoogleResponse_WrongOrder(t *testing.T) {
 	str, _ := ioutil.ReadFile("testdata/google_finance_day_unexpected_order")
-	result, err := readGoogleResponse(string(str))
+	_, err := readGoogleResponse(string(str))
 
-	assert.NotNil(t, err)
-	assert.Nil(t, result)
+	assert.Error(t, err)
 }
 
 func Test_readGoogleResponse_Unknown(t *testing.T) {
 	str, _ := ioutil.ReadFile("testdata/google_finance_unknown")
-	result, err := readGoogleResponse(string(str))
+	_, err := readGoogleResponse(string(str))
 
-	assert.NotNil(t, err)
-	assert.Nil(t, result)
+	assert.Error(t, err)
 }
+

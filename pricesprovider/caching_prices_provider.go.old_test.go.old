@@ -1,0 +1,129 @@
+//package pricesprovider
+//
+//import (
+//	"errors"
+//	"reflect"
+//	"testing"
+//	"time"
+//
+//	"github.com/stretchr/testify/assert"
+//	"github.com/stretchr/testify/mock"
+//	"org.alex859/stockprices/domain"
+//	"org.alex859/stockprices/usecases"
+//	"org.alex859/stockprices/usecases/mocks"
+//)
+//
+//func Test_WHEN__ErrorGettingPrices_THEN_NotCallSave(t *testing.T) {
+//	priceProvider := &mocks.PricesProviderMock{}
+//	priceSaver := &mocks.PricesSaverMock{}
+//	providerUT := NewCachingPricesProvider(priceProvider, priceSaver)
+//	var may5, _ = time.Parse("02-01-2006", "05-05-2018")
+//	var may9, _ = time.Parse("02-01-2006", "09-05-2018")
+//	ticker := domain.Ticker{Market: "LON", Symbol: "ANP"}
+//	interval, err := domain.NewDateInterval(may5, may9)
+//	priceProvider.On("FetchPrices", ticker, interval).Return(nil, errors.New("error"))
+//
+//	_, err = providerUT.FetchPrices(ticker, interval)
+//
+//	assert.NotNil(t, err)
+//	priceSaver.AssertNotCalled(t, "SavePrices", mock.Anything, mock.Anything)
+//}
+//
+//func Test_WHEN__ErrorSaving_THEN_ReturnResult(t *testing.T) {
+//	priceProvider := &mocks.PricesProviderMock{}
+//	priceSaver := &mocks.PricesSaverMock{}
+//	providerUT := NewCachingPricesProvider(priceProvider, priceSaver)
+//	var may5, _ = time.Parse("02-01-2006", "05-05-2018")
+//	var may9, _ = time.Parse("02-01-2006", "09-05-2018")
+//	ppMay5 := domain.PricePoint{Price: 123, Time: may5}
+//	ppMay9 := domain.PricePoint{Price: 123, Time: may9}
+//	ticker := domain.Ticker{Market: "LON", Symbol: "ANP"}
+//	expected := &domain.PriceHistory{
+//		Ticker: ticker, Currency: "GBX", LastPrice: 125, LastPriceTime: "last time", Name: "Anpario",
+//		Prices: domain.PriceList{ppMay5, ppMay9},
+//	}
+//	interval, err := domain.NewDateInterval(may5, may9)
+//	priceProvider.On("FetchPrices", ticker, interval).Return(expected, nil)
+//	errorsChannel := make(chan error)
+//	priceSaver.On("SavePrices", ticker, expected).Return(errorsChannel)
+//
+//	result, err := providerUT.FetchPrices(ticker, interval)
+//
+//	assert.Nil(t, err)
+//	assert.Equal(t, expected, result)
+//	priceSaver.AssertCalled(t, "SavePrices", ticker, expected)
+//}
+//
+//func Test_WHEN__AllGood_THEN_ReturnResultAndSave(t *testing.T) {
+//
+//	priceProvider := &mocks.PricesProviderMock{}
+//	priceSaver := &mocks.PricesSaverMock{}
+//	providerUT := NewCachingPricesProvider(priceProvider, priceSaver)
+//	var may5, _ = time.Parse("02-01-2006", "05-05-2018")
+//	var may9, _ = time.Parse("02-01-2006", "09-05-2018")
+//	ppMay5 := domain.PricePoint{Price: 123, Time: may5}
+//	ppMay9 := domain.PricePoint{Price: 123, Time: may9}
+//	ticker := domain.Ticker{Market: "LON", Symbol: "ANP"}
+//	expected := &domain.PriceHistory{
+//		Ticker: ticker, Currency: "GBX", LastPrice: 125, LastPriceTime: "last time", Name: "Anpario",
+//		Prices: domain.PriceList{ppMay5, ppMay9},
+//	}
+//	interval, err := domain.NewDateInterval(may5, may9)
+//	priceProvider.On("FetchPrices", ticker, interval).Return(expected, nil)
+//	priceSaver.On("SavePrices", ticker, expected).Return(make(chan error))
+//
+//	result, err := providerUT.FetchPrices(ticker, interval)
+//
+//	assert.Nil(t, err)
+//	assert.Equal(t, expected, result)
+//	priceSaver.AssertCalled(t, "SavePrices", ticker, expected)
+//}
+//
+//func TestNewCachingPricesProvider(t *testing.T) {
+//	type args struct {
+//		provider usecases.PricesProvider
+//		saver    PricesSaver
+//	}
+//	tests := []struct {
+//		name string
+//		args args
+//		want *cachingPricesProvider
+//	}{
+//		// TODO: Add test cases.
+//	}
+//	for _, tt := range tests {
+//		t.Run(tt.name, func(t *testing.T) {
+//			if got := NewCachingPricesProvider(tt.args.provider, tt.args.saver); !reflect.DeepEqual(got, tt.want) {
+//				t.Errorf("NewCachingPricesProvider() = %v, want %v", got, tt.want)
+//			}
+//		})
+//	}
+//}
+//
+//func Test_cachingPricesProvider_FetchPrices(t *testing.T) {
+//	type args struct {
+//		ticker   domain.Ticker
+//		interval *domain.DateInterval
+//	}
+//	tests := []struct {
+//		name    string
+//		cpp     *cachingPricesProvider
+//		args    args
+//		want    *domain.PriceHistory
+//		wantErr bool
+//	}{
+//		// TODO: Add test cases.
+//	}
+//	for _, tt := range tests {
+//		t.Run(tt.name, func(t *testing.T) {
+//			got, err := tt.cpp.FetchPrices(tt.args.ticker, tt.args.interval)
+//			if (err != nil) != tt.wantErr {
+//				t.Errorf("cachingPricesProvider.FetchPrices() error = %v, wantErr %v", err, tt.wantErr)
+//				return
+//			}
+//			if !reflect.DeepEqual(got, tt.want) {
+//				t.Errorf("cachingPricesProvider.FetchPrices() = %v, want %v", got, tt.want)
+//			}
+//		})
+//	}
+//}

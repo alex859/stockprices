@@ -1,9 +1,10 @@
-package interfaces
+package domain
 
 type period struct {
 	Str      string
 	Interval string
 }
+
 type Period int
 const (
 	Max Period = iota
@@ -14,28 +15,27 @@ const (
 	YearToDate
 	FiveDays
 	OneDay
-	Unknown
 )
-func (p Period) Value() *period {
+func (p Period) Value() period {
 	switch p {
 	case Max:
-		return &period{Str: "40Y", Interval: "604800"}
+		return period{Str: "40Y", Interval: "86400"}
 	case FiveYears:
-		return &period{Str: "5Y", Interval: "604800"}
+		return period{Str: "5Y", Interval: "86400"}
 	case OneYear:
-		return &period{Str: "1Y", Interval: "86400"}
+		return period{Str: "1Y", Interval: "86400"}
 	case SixMonth:
-		return &period{Str: "6M", Interval: "86400"}
+		return period{Str: "6M", Interval: "86400"}
 	case OneMonth:
-		return &period{Str: "1M", Interval: "86400"}
+		return period{Str: "1M", Interval: "86400"}
 	case YearToDate:
-		return &period{Str: "YTD", Interval: "86400"}
+		return period{Str: "YTD", Interval: "86400"}
 	case FiveDays:
-		return &period{Str: "5d", Interval: "1800"}
+		return period{Str: "5d", Interval: "1800"}
 	case OneDay:
-		return &period{Str: "1d", Interval: "300"}
+		return period{Str: "1d", Interval: "300"}
 	default:
-		return &period{}
+		return period{}
 	}
 }
 

@@ -1,0 +1,28 @@
+//package pricesprovider
+//
+//import (
+//	"org.alex859/stockprices/usecases"
+//	"org.alex859/stockprices/domain"
+//)
+//
+//type defaultPricesProvider struct {
+//	cachedPricesProvider usecases.PricesProvider
+//	pricesProvider       usecases.PricesProvider
+//}
+//
+//func NewDefaultPricesProvider(cachedPricesProvider usecases.PricesProvider, pricesProvider usecases.PricesProvider, saver PricesSaver) *defaultPricesProvider {
+//	return &defaultPricesProvider{
+//		cachedPricesProvider: cachedPricesProvider,
+//		pricesProvider:       NewCachingPricesProvider(pricesProvider, saver),
+//	}
+//}
+//
+//func (dpp *defaultPricesProvider) FetchPrices(ticker domain.Ticker, interval *domain.DateInterval) (*domain.PriceHistory, error) {
+//	result, err := dpp.cachedPricesProvider.GetPrices(ticker, interval)
+//
+//	if err == nil {
+//		return result, err
+//	}
+//
+//	return dpp.pricesProvider.GetPrices(ticker, interval)
+//}
