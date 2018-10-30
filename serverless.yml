@@ -11,7 +11,7 @@
 #
 # Happy Coding!
 
-service: stockprices # NOTE: update this with your service name
+service: stockprices
 
 # You can pin your service to only deploy with a specific Serverless version
 # Check out our docs for more details
@@ -47,18 +47,29 @@ provider:
 #    variable1: value1
 
 package:
+ individually: true
  exclude:
    - ./**
- include:
-   - ./bin/**
 
 functions:
-  getPrices:
-    handler: bin/stockprices
+  getHistoricalPrices:
+    handler: bin/handlers/historicalprices
+    package:
+      include:
+        - ./bin/handlers/historicalprices
     events:
       - http:
-          path: getPrices
+          path: historicalPrices
           method: get
+  getCurrentPrices:
+      handler: bin/handlers/currentprice
+      package:
+        include:
+          - ./bin/handlers/currentprice
+      events:
+        - http:
+            path: currentPrices
+            method: get
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details

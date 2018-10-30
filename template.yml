@@ -2,14 +2,25 @@ AWSTemplateFormatVersion : '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: Gets stock prices.
 Resources:
-  HelloWorldFunction:
+  getCurrentPrices:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: bin/stockprices
+      Handler: bin/handlers/currentprice
       Runtime: go1.x
       Events:
         Vote:
           Type: Api
           Properties:
-            Path: /getPrices
+            Path: /currentPrices
+            Method: get
+  getHistoricalPrices:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: bin/handlers/historicalprices
+      Runtime: go1.x
+      Events:
+        Vote:
+          Type: Api
+          Properties:
+            Path: /historicalPrices
             Method: get
