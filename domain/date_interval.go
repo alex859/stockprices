@@ -49,7 +49,11 @@ func (interval DateInterval) ToPeriod() Period {
 }
 
 func (interval DateInterval) Contains(t time.Time) bool {
-	return (t.After(interval.from) || t.Equal(interval.from)) && (t.Before(interval.to) || t.Equal(interval.to))
+	return (t.After(interval.from) || t.Equal(interval.from) || sameDay(t, interval.from)) && (t.Before(interval.to) || t.Equal(interval.to) || sameDay(t, interval.to))
+}
+
+func sameDay(t1 time.Time, t2 time.Time) bool {
+	return t1.Day() == t2.Day() && t1.Month() == t2.Month() && t1.Year() == t2.Year()
 }
 
 func (interval DateInterval) String() string {
