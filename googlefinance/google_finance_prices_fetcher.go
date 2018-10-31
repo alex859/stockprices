@@ -1,18 +1,18 @@
 package googlefinance
 
 import (
-	"log"
-	"github.com/PuerkitoBio/goquery"
-	"strings"
-	"net/http"
-	"io/ioutil"
 	"fmt"
 	"github.com/Knetic/govaluate"
-	"regexp"
-	"reflect"
-	"golang.org/x/net/html"
-	"org.alex859/stockprices/domain"
+	"github.com/PuerkitoBio/goquery"
 	"github.com/pkg/errors"
+	"golang.org/x/net/html"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"org.alex859/stockprices/domain"
+	"reflect"
+	"regexp"
+	"strings"
 )
 
 // Service to go off to GoogleFinance and gather prices.
@@ -22,6 +22,7 @@ type defaultGoogleFinancePricesFetcher struct {
 	httpClient *http.Client
 }
 
+// NewDefaultGooglePricesFetcher creates a new defaultGoogleFinancePricesFetcher.
 func NewDefaultGooglePricesFetcher(client *http.Client) *defaultGoogleFinancePricesFetcher {
 	return &defaultGoogleFinancePricesFetcher{client}
 }
@@ -49,8 +50,8 @@ func (gp *defaultGoogleFinancePricesFetcher) FetchPrices(market string, symbol s
 }
 
 func (gp *defaultGoogleFinancePricesFetcher) getQuotesText(symbolEncoded, eiCode string, period domain.Period) (string, error) {
-	const quotesUrlTemplate = "https://www.google.com/async/finance_wholepage_chart?ei=%s&yv=3&async=mid_list:%s,period:%s,interval:%s,extended:true,element_id:fw-uid_%s_1,_id:fw-uid_%s_1,_pms:s,_fmt:pc"
-	quotesText, err := gp.htmlFrom(fmt.Sprintf(quotesUrlTemplate, eiCode, symbolEncoded, period.Value().Str, period.Value().Interval, eiCode, eiCode))
+	const quotesURLTemplate = "https://www.google.com/async/finance_wholepage_chart?ei=%s&yv=3&async=mid_list:%s,period:%s,interval:%s,extended:true,element_id:fw-uid_%s_1,_id:fw-uid_%s_1,_pms:s,_fmt:pc"
+	quotesText, err := gp.htmlFrom(fmt.Sprintf(quotesURLTemplate, eiCode, symbolEncoded, period.Value().Str, period.Value().Interval, eiCode, eiCode))
 	if err != nil {
 		return "", errors.Wrap(err, "unable to read HTML")
 	}
@@ -204,7 +205,7 @@ func readGoogleResponse(str string) (domain.GoogleFinanceResponse, error) {
 		Symbol:        data617[2].(string),
 		LastPrice:     toString(data617[4]),
 		LastPriceTime: data617[8].(string),
-		PricesRows:        prices,
+		PricesRows:    prices,
 	}, nil
 }
 

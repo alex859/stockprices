@@ -9,7 +9,7 @@ import (
 )
 
 var goodResponse = domain.GoogleFinanceResponse{
-	Symbol:"ANP", Market:"LON", Currency:"GBX", Name:"Anpario", LastPrice:"12.25", LastPriceTime:"6 Sep, 15:04 BST",
+	Symbol:"ANP", Market:"LON", Currency:"GBX", Name:"Anpario", LastPrice:"12.25", LastPriceTime:"Sep 6, 2:04 PM GMT",
 	PricesRows:[]domain.GoogleFinancePriceRow{
 		{Time:"25584030", Price:"20.25"},
 		{Time:"25585030", Price:"20.26"},
@@ -33,7 +33,7 @@ var wrongLastPriceTime = domain.GoogleFinanceResponse{
 }
 
 var wrongTime = domain.GoogleFinanceResponse{
-	Symbol:"ANP", Market:"LON", Currency:"GBX", Name:"Anpario", LastPrice:"12.25", LastPriceTime:"6 Sep, 15:04 BST",
+	Symbol:"ANP", Market:"LON", Currency:"GBX", Name:"Anpario", LastPrice:"12.25", LastPriceTime:"Sep 6, 2:04 PM GMT",
 	PricesRows:[]domain.GoogleFinancePriceRow{
 		{Time:"2AA84030", Price:"20.25"},
 		{Time:"25585030", Price:"20.26"},
@@ -41,7 +41,7 @@ var wrongTime = domain.GoogleFinanceResponse{
 }
 
 var wrongPrice = domain.GoogleFinanceResponse{
-	Symbol:"ANP", Market:"LON", Currency:"GBX", Name:"Anpario", LastPrice:"12.25", LastPriceTime:"6 Sep, 15:04 BST",
+	Symbol:"ANP", Market:"LON", Currency:"GBX", Name:"Anpario", LastPrice:"12.25", LastPriceTime:"Sep 6, 2:04 PM GMT",
 	PricesRows:[]domain.GoogleFinancePriceRow{
 		{Time:"25584030", Price:"20.25"},
 		{Time:"25585030", Price:"20.26sss"},

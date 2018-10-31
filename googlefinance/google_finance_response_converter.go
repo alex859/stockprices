@@ -1,12 +1,13 @@
 package googlefinance
 
 import (
-	"org.alex859/stockprices/domain"
-	"time"
+	"fmt"
 	"strconv"
 	"strings"
-	"fmt"
+	"time"
+
 	"github.com/pkg/errors"
+	"org.alex859/stockprices/domain"
 )
 
 // Default implementation of conversion logic from google finance response to PriceHistory and CurrentPrice.
@@ -16,6 +17,9 @@ type googleFinanceResponseConverter struct {
 // for testing
 var now = time.Now
 
+var dateLayout = "Jan 2, 3:04 PM MST 2006"
+
+// NewGoogleFinanceResponseConverter creates a new googleFinanceResponseConverter.
 func NewGoogleFinanceResponseConverter() *googleFinanceResponseConverter {
 	return &googleFinanceResponseConverter{}
 }
@@ -25,7 +29,7 @@ func (converter *googleFinanceResponseConverter) ConvertToPriceHistory(response 
 	if priceList, err = convertPriceRows(response.PricesRows); err == nil {
 		result = domain.PriceHistory{
 			TickerInfo: convertTickerInfo(response),
-			Prices:priceList,
+			Prices:     priceList,
 		}
 	}
 	err = errors.Wrap(err, "error converting to price history")
@@ -37,21 +41,21 @@ func (converter *googleFinanceResponseConverter) ConvertToCurrentPrice(response 
 	if price, err = convertPrice(response.LastPrice); err == nil {
 		var lastTime time.Time
 		currentYear := now().Year()
-		if lastTime, err = time.Parse("2 Jan, 15:04 MST 2006", fmt.Sprintf("%s %v", response.LastPriceTime, currentYear)); err == nil {
+		if lastTime, err = time.Parse(dateLayout, fmt.Sprintf("%s %v", response.LastPriceTime, currentYear)); err == nil {
 			result = domain.CurrentPrice{
 				TickerInfo: convertTickerInfo(response),
-				Price:price,
-				Time:lastTime.In(time.UTC),
+				Price:      price,
+				Time:       lastTime.In(time.UTC),
 			}
 		}
 	}
 	return result, errors.Wrap(err, "error converting to current price")
 }
 
-func convertPriceRows (priceRows []domain.GoogleFinancePriceRow) (domain.PriceList, error) {
+func convertPriceRows(priceRows []domain.GoogleFinancePriceRow) (domain.PriceList, error) {
 	result := make(domain.PriceList, len(priceRows))
 	for i, p := range priceRows {
-		if pp, err:= convertPriceRow(p); err == nil {
+		if pp, err := convertPriceRow(p); err == nil {
 			result[i] = pp
 		} else {
 			return result, errors.Wrap(err, "error converting price rows")
@@ -61,15 +65,14 @@ func convertPriceRows (priceRows []domain.GoogleFinancePriceRow) (domain.PriceLi
 	return result, nil
 }
 
-
 func convertPriceRow(priceRow domain.GoogleFinancePriceRow) (result domain.PricePoint, err error) {
 	var p float64
 	if p, err = convertPrice(priceRow.Price); err == nil {
 		var t float64
 		if t, err = strconv.ParseFloat(priceRow.Time, 64); err == nil {
 			result = domain.PricePoint{
-				Price:p,
-				Time:time.Unix(60*(int64(t)), 0).In(time.UTC),
+				Price: p,
+				Time:  time.Unix(60*(int64(t)), 0).In(time.UTC),
 			}
 		}
 	}
@@ -78,16 +81,16 @@ func convertPriceRow(priceRow domain.GoogleFinancePriceRow) (result domain.Price
 
 func convertTickerInfo(response domain.GoogleFinanceResponse) domain.TickerInfo {
 	return domain.TickerInfo{
-		Ticker: convertTicker(response),
-		Currency:response.Currency,
-		Name:response.Name,
+		Ticker:   convertTicker(response),
+		Currency: response.Currency,
+		Name:     response.Name,
 	}
 }
 
 func convertTicker(response domain.GoogleFinanceResponse) domain.Ticker {
 	return domain.Ticker{
-		Symbol:response.Symbol,
-		Market:response.Market,
+		Symbol: response.Symbol,
+		Market: response.Market,
 	}
 }
 
