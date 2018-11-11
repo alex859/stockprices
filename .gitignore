@@ -3,3 +3,4 @@
 vendor
 .serverless
 bin
+.vscode
