@@ -6,11 +6,11 @@ echo "Compiling functions to bin/handlers/ ..."
 
 rm -rf bin/
 
-cd handlers/
+cd presentation/handlers/
 for f in */; do
   filename="$f${f:0:-1}.go"
   echo $filename
-  if GOOS=linux go build -o "../bin/handlers/${f:0:-1}" $filename; then
+  if GOOS=linux go build -o "../../bin/handlers/${f:0:-1}" $filename; then
     echo "✓ Compiled $filename"
   else
     echo "✕ Failed to compile $filename!"
